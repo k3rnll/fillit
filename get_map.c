@@ -6,7 +6,7 @@
 /*   By: tmarkita <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/02 13:39:09 by tmarkita          #+#    #+#             */
-/*   Updated: 2020/02/02 16:14:52 by tmarkita         ###   ########.fr       */
+/*   Updated: 2020/02/02 21:18:50 by tmarkita         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,34 +40,45 @@ char	*create_map(int size)
 	return (tmp);
 }
 
-void	erase_map(char *map)
+void	validate_minos(char **map)
 {
+	int		total;
 	int		i;
 
+	total = 0;
 	i = 0;
-	while (map[i] != '\0')
+	while ((*map)[i] != '\0')
 	{
-		if (map[i] != '.' && map[i] != '\n')
-			map[i] = '.';
+		if ((*map)[i] == '#')
+			total++;
 		i++;
+	}
+	if (total > g_count * 4)
+	{
+		write(1, "error\n", 6);
+		exit(0);
 	}
 }
 
 int		map_to_massive(char *map, int *mino_arr)
 {
-	char	*arr[g_count];
+	char	**arr;
 	char	*tmp;
 	int		k;
 	int		l;
 
 	k = 0;
 	l = 0;
-	tmp = (char*)malloc(sizeof(char) * 17);
+	if (!(arr = (char**)malloc(sizeof(char*) * g_count)))
+		put_error(1);
+	if (!(tmp = ft_strnew(16)))
+		put_error(1);
 	while (*map != '\0')
 	{
 		if (k == 17)
 		{
-			arr[l++] = ft_strsub(&tmp[0], 0, 16);
+			if (!(arr[l++] = ft_strsub(&tmp[0], 0, 16)))
+				put_error(1);
 			k = 0;
 			continue;
 		}
@@ -75,9 +86,11 @@ int		map_to_massive(char *map, int *mino_arr)
 			map++;
 		tmp[k++] = *(map++);
 	}
-	arr[l++] = ft_strsub(&tmp[0], 0, 16);
+	if (!(arr[l++] = ft_strsub(&tmp[0], 0, 16)))
+		put_error(1);
 	free(tmp);
 	compare(&arr[0], mino_arr);
+	free(arr);
 	return (1);
 }
 
@@ -116,7 +129,8 @@ int		get_map(char *av, char **map)
 	int		ret;
 
 	fd = open(av, O_RDONLY);
-	*map = ft_strnew(1024);
+	if (!(*map = ft_strnew(1024)))
+		put_error(1);
 	ret = read(fd, *map, 1024);
 	(*map)[ret] = '\0';
 	close(fd);

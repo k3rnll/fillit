@@ -61,30 +61,6 @@ void	init(void)
 	init_second();
 }
 
-int		convert_map(char **map)
-{
-	char	c;
-	int		i;
-
-	i = 0;
-	c = 'A';
-	while ((*map)[i] != '\0')
-	{
-		if (c == 'Z' + 1)
-			return (0);
-		while ((*map)[i] != '\n' && (*map)[i] != '\0')
-		{
-			if ((*map)[i] == '#')
-				(*map)[i] = c;
-			i++;
-		}
-		if ((*map)[i + 1] == '\n')
-			c++;
-		i++;
-	}
-	return (1);
-}
-
 int		main(int ac, char **av)
 {
 	char	*map;
